@@ -1,1 +1,10 @@
 /bin
+qr.png
+log.out
+sensors/
+services/
+.settings/
+
+#client and server libraries should be build with ANT
+lib/client/
+lib/server/
