@@ -933,7 +933,7 @@ public class CuckooServer {
 		}
 
 		// now try to find the class
-		Class<?> serviceClass = Class.forName(serviceName + "Impl", true,
+		Class<?> serviceClass = Class.forName(serviceName /*+ "Impl"*/, true,
 				new URLClassLoader(jarURLs.toArray(new URL[] {})));
 
 		// and invoke the constructor
