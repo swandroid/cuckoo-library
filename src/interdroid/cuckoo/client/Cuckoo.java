@@ -406,6 +406,7 @@ public class Cuckoo {
 					fileIn = new BufferedInputStream(mContext.getAssets().open(
 							sensor.getClass().getSimpleName() + File.separator
 									+ fileName));
+					length = 0;
 					while ((read = fileIn.read(buf)) > 0) {
 						length += read;
 					}
