@@ -47,7 +47,8 @@ public class RemoteMonitorThread extends Thread {
 			try {
 				sleep(sensor.getInterval(configuration, true));
 			} catch (InterruptedException e) {
-				// ignore, we will exit the loop anyways
+				System.out.println(e);
+				break;
 			}
 		}
 	}
