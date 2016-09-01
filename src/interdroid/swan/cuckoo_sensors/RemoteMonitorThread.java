@@ -1,8 +1,14 @@
 package interdroid.swan.cuckoo_sensors;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import com.google.android.gcm.server.Constants;
 import com.google.android.gcm.server.Message;
@@ -38,8 +44,9 @@ public class RemoteMonitorThread extends Thread {
 				previous.putAll(values);
 				// push with GCM
 				try {
-					push(registrationId, apiKey, values, true);
-				} catch (IOException e) {
+					//push(registrationId, apiKey, values, true);
+					pushFirebase(registrationId, apiKey, values);
+				} catch (Exception e) {
 					e.printStackTrace(System.out);
 					// should not happen
 				}
@@ -102,6 +109,54 @@ public class RemoteMonitorThread extends Thread {
 			}
 			System.out.println("ok 2: " + error);
 		}
+	}
+	
+	public final void pushFirebase(String registrationId, String apiKey,
+			Map<String, Object> args) {
+		
+		URL url;
+		try {
+			url = new URL("https://fcm.googleapis.com/fcm/send");
+			HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+		    conn.setRequestMethod("POST");
+		    conn.setRequestProperty("Content-Type", "application/json");
+		    conn.setRequestProperty("Authorization", "key=" + apiKey);
+		    conn.setDoOutput(true);
+
+		    String input = "{\"to\" : \"" + registrationId +" \", \"data\": {";
+
+		    for (String key : args.keySet()) {
+				input += "\""+key+"\": \"" + args.get(key) + "\"";
+			}
+		    input += "}}";
+		    
+	        //String json = gson.toJson(data, type);
+		    OutputStream os = conn.getOutputStream();
+		    os.write(input.getBytes("UTF-8"));
+		    os.flush();
+		    os.close();
+		    
+		    int responseCode = conn.getResponseCode();
+			System.out.println("\nSending 'POST' request to URL : " + url);
+			System.out.println("Response Code : " + responseCode);
+
+			BufferedReader in = new BufferedReader(
+			        new InputStreamReader(conn.getInputStream()));
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			//print result
+			System.out.println(response.toString());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
 	}
 
 }

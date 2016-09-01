@@ -289,6 +289,7 @@ public class Cuckoo {
 			mOut.flush();
 			createIn();
 			int resultCode = mIn.read();
+			Log.d(TAG, "  result: " + Protocol.toString(resultCode));
 			if (resultCode == Protocol.RESULT_OK) {
 				return;
 			} else if (resultCode == Protocol.RESULT_EXCEPTION) {
