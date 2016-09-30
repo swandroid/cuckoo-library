@@ -45,6 +45,7 @@ public class RemoteMonitorThread extends Thread {
 				// push with GCM
 				try {
 					//push(registrationId, apiKey, values, true);
+					values.put("ts", System.currentTimeMillis());
 					pushFirebase(registrationId, apiKey, values);
 				} catch (Exception e) {
 					e.printStackTrace(System.out);
