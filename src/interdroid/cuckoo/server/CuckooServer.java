@@ -118,7 +118,7 @@ public class CuckooServer {
 	/**
 	 * The default port the server listens on
 	 */
-	private static final int PORT = 9000;
+	private static final int PORT = 9001;
 
 	/**
 	 * Starts a new Cuckoo Server. Any arguments will be ignored.
