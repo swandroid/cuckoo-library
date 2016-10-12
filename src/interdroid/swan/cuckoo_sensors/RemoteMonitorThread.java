@@ -46,6 +46,7 @@ public class RemoteMonitorThread extends Thread {
 				try {
 					//push(registrationId, apiKey, values, true);
 					values.put("ts", System.currentTimeMillis());
+					values.put("value_path", valuePath);
 					pushFirebase(registrationId, apiKey, values);
 				} catch (Exception e) {
 					e.printStackTrace(System.out);
@@ -138,8 +139,8 @@ public class RemoteMonitorThread extends Thread {
 		    os.close();
 		    
 		    int responseCode = conn.getResponseCode();
-			System.out.println("\nSending 'POST' request to URL : " + url);
-			System.out.println("Response Code : " + responseCode);
+//			System.out.println("\nSending 'POST' request to URL : " + url);
+//			System.out.println("Response Code : " + responseCode);
 
 			BufferedReader in = new BufferedReader(
 			        new InputStreamReader(conn.getInputStream()));
@@ -152,7 +153,7 @@ public class RemoteMonitorThread extends Thread {
 			in.close();
 
 			//print result
-			System.out.println(response.toString());
+//			System.out.println(response.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
