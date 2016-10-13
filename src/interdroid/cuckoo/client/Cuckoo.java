@@ -676,7 +676,7 @@ public class Cuckoo {
 	 * @param id
 	 * @throws NoResourceAvailableException
 	 */
-	public static void unregister(Context context, Resource resource, String id)
+	public static  synchronized void unregister(Context context, Resource resource, String id)
 			throws NoResourceAvailableException {
 		try {
 			Communicator communicator = new Communicator(context, resource);
@@ -793,7 +793,7 @@ public class Cuckoo {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public static Object invokeMethod(Context context, Statistics statistics,
+	public static synchronized  Object invokeMethod(Context context, Statistics statistics,
 			String serviceName, String methodName, Class<?>[] parameterTypes,
 			boolean[] outParameters, Object[] parameters, String strategy,
 			float weight, long inputSize, long outputSize, boolean screenOn)
