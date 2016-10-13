@@ -274,7 +274,7 @@ public class Cuckoo {
 
 		}
 
-		private void register(String registrationId, String apiKey,
+		private synchronized void register(String registrationId, String apiKey,
 				CuckooPoller sensor, String id, String valuePath,
 				Map<String, Object> configuration) throws Exception {
 			Log.d(TAG, "register sensor '" + sensor.getClass().getName() + "'");
@@ -651,7 +651,7 @@ public class Cuckoo {
 	 * @param configuration
 	 * @throws NoResourceAvailableException
 	 */
-	public static void register(Context context, Resource resource,
+	public static synchronized void register(Context context, Resource resource,
 			String registrationId, String apiKey, CuckooPoller sensor,
 			String id, String valuePath, Map<String, Object> configuration)
 			throws NoResourceAvailableException {
