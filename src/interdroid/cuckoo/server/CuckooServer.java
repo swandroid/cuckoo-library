@@ -59,8 +59,8 @@ import org.slf4j.LoggerFactory;
  */
 public class CuckooServer {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger("interdroid.cuckoo.server");
+//	private static final Logger logger = LoggerFactory
+//			.getLogger("interdroid.cuckoo.server");
 
 	/**
 	 * The directory where the Cuckoo Server stores installed services
@@ -141,25 +141,25 @@ public class CuckooServer {
 			throws IOException {
 		// read the service name
 		final String serviceName = in.readUTF();
-		logger.debug("   installing service '" + serviceName + "'...");
+		System.out.println("   installing service '" + serviceName + "'...");
 		// then the files belonging to this service
 		int nrFiles = in.readInt();
-		logger.debug("     has " + nrFiles + " files");
+		System.out.println("     has " + nrFiles + " files");
 		Map<String, byte[]> files = new HashMap<String, byte[]>();
 		for (int i = 0; i < nrFiles; i++) {
 			String fileName = in.readUTF();
 			int size = in.readInt();
-			logger.debug("       reading '" + fileName + "' of size " + size);
+			System.out.println("       reading '" + fileName + "' of size " + size);
 			byte[] file = new byte[size];
 			in.readFully(file);
 			files.put(fileName, file);
 		}
-		logger.debug("     done reading files");
+		System.out.println("     done reading files");
 		try {
 			// now try to install the service
-			logger.debug("     invoking installService");
+			System.out.println("     invoking installService");
 			installService(serviceName, files);
-			logger.debug("   installing service '" + serviceName
+			System.out.println("   installing service '" + serviceName
 					+ "' succeeded");
 			out.write(Protocol.RESULT_OK);
 			out.flush();
@@ -167,7 +167,7 @@ public class CuckooServer {
 		} catch (Exception e) {
 			// if something failed, write the exception into the
 			// message.
-			logger.debug("   installing service '" + serviceName + "' failed: "
+			System.out.println("   installing service '" + serviceName + "' failed: "
 					+ e);
 			out.write(Protocol.RESULT_EXCEPTION);
 			out.writeObject(e);
@@ -180,19 +180,19 @@ public class CuckooServer {
 			ObjectOutputStream out) throws IOException {
 		// read the service name
 		final String serviceName = in.readUTF();
-		logger.debug("   initializing service '" + serviceName + "'...");
+		System.out.println("   initializing service '" + serviceName + "'...");
 		try {
 			// now try to initialize the service
 			initializeService(serviceName);
 			out.write(Protocol.RESULT_OK);
 			out.flush();
-			logger.debug("   initializing service '" + serviceName
+			System.out.println("   initializing service '" + serviceName
 					+ "' succeeded");
 			return false;
 		} catch (Exception e) {
 			// if something failed, write the exception into the
 			// message.
-			logger.debug("   initializing service '" + serviceName
+			System.out.println("   initializing service '" + serviceName
 					+ "' failed: " + e);
 			out.write(Protocol.RESULT_EXCEPTION);
 			out.writeObject(e);
@@ -207,27 +207,27 @@ public class CuckooServer {
 		final long start = System.currentTimeMillis();
 		// read the service name
 		final String serviceName = in.readUTF();
-		logger.debug("   invoking method on service '" + serviceName + "'...");
+		System.out.println("   invoking method on service '" + serviceName + "'...");
 		// the method name
 		final String methodName = in.readUTF();
-		logger.debug("     method: " + methodName);
+		System.out.println("     method: " + methodName);
 		// read the parameter type array
 		final Class<?>[] parameterTypes = (Class<?>[]) in.readObject();
-		logger.debug("     parameter types: " + Arrays.toString(parameterTypes));
+		System.out.println("     parameter types: " + Arrays.toString(parameterTypes));
 		// read the types of parameters array (in or out/inout)
 		final boolean[] outParameters = (boolean[]) in.readObject();
-		logger.debug("     out parameters: " + Arrays.toString(outParameters));
+		System.out.println("     out parameters: " + Arrays.toString(outParameters));
 		// read the actual parameter values
 		final Object[] parameters = (Object[]) in.readObject();
-		logger.debug("     parameter values: " + Arrays.toString(parameters));
+		System.out.println("     parameter values: " + Arrays.toString(parameters));
 		// do we have to forward?
 		final boolean forwardToUnknownResources = in.readBoolean();
-		logger.debug("     forward to unknown resources: "
+		System.out.println("     forward to unknown resources: "
 				+ forwardToUnknownResources);
 		// read unknown resources
 		final String[] unknownResources = (forwardToUnknownResources) ? in
 				.readUTF().split(",") : null;
-		logger.debug("       unknownResources: "
+		System.out.println("       unknownResources: "
 				+ (unknownResources == null ? "n.a." : Arrays
 						.toString(unknownResources)));
 		final long uploadTime = System.currentTimeMillis() - start;
@@ -236,7 +236,7 @@ public class CuckooServer {
 			Object result = invokeMethod(serviceName, methodName,
 					parameterTypes, parameters);
 			final long executionTime = System.currentTimeMillis() - startMethod;
-			logger.debug("     result: " + result);
+			System.out.println("     result: " + result);
 			out.write(Protocol.RESULT_OK);
 			out.flush();
 			out.writeObject(result);
@@ -248,15 +248,15 @@ public class CuckooServer {
 			out.writeLong(executionTime);
 			out.writeLong(uploadTime);
 			out.flush();
-			logger.debug("   invoking method '" + methodName + "' on service '"
+			System.out.println("   invoking method '" + methodName + "' on service '"
 					+ serviceName + "' succeeded");
-			logger.debug("     upload: " + uploadTime);
-			logger.debug("     execution: " + executionTime);
-			logger.debug("     download: "
+			System.out.println("     upload: " + uploadTime);
+			System.out.println("     execution: " + executionTime);
+			System.out.println("     download: "
 					+ (System.currentTimeMillis() - startMethod - executionTime));
 			return true;
 		} catch (Throwable t) {
-			logger.debug("   invoking method '" + methodName + "' on service '"
+			System.out.println("   invoking method '" + methodName + "' on service '"
 					+ serviceName + "' failed: " + t);
 			out.write(Protocol.RESULT_EXCEPTION);
 			out.writeObject(t);
@@ -290,13 +290,13 @@ public class CuckooServer {
 	// TODO: check data input stream
 	private void handleDebug(ObjectInputStream in, ObjectOutputStream out,
 			long start) throws IOException {
-		logger.debug("   invoking debug...");
+		System.out.println("   invoking debug...");
 		long sleepTime = in.readLong();
-		logger.debug("     sleep: " + sleepTime);
+		System.out.println("     sleep: " + sleepTime);
 		int returnSize = in.readInt();
-		logger.debug("     return: " + returnSize);
+		System.out.println("     return: " + returnSize);
 		int inputSize = in.readInt();
-		logger.debug("     input: " + inputSize);
+		System.out.println("     input: " + inputSize);
 		in.readFully(new byte[inputSize]);
 		long uploadTime = System.currentTimeMillis() - start;
 		// sleep
@@ -317,38 +317,38 @@ public class CuckooServer {
 	private boolean handleInstallSensor(ObjectInputStream in,
 			ObjectOutputStream out) throws IOException {
 		String sensorName = in.readUTF();
-		logger.debug("   installing sensor '" + sensorName + "'...");
+		System.out.println("   installing sensor '" + sensorName + "'...");
 		int fileSize = in.readInt();
-		logger.debug("       reading '" + sensorName + ".class' of size "
+		System.out.println("       reading '" + sensorName + ".class' of size "
 				+ fileSize);
 		byte[] classFile = new byte[fileSize];
 		in.readFully(classFile);
 		// then the files belonging to this service
 		int nrFiles = in.readInt();
-		logger.debug("     has " + nrFiles + " jar files");
+		System.out.println("     has " + nrFiles + " jar files");
 		Map<String, byte[]> files = new HashMap<String, byte[]>();
 		for (int i = 0; i < nrFiles; i++) {
 			String fileName = in.readUTF();
 			int size = in.readInt();
-			logger.debug("       reading '" + fileName + "' of size " + size);
+			System.out.println("       reading '" + fileName + "' of size " + size);
 			byte[] file = new byte[size];
 			in.readFully(file);
 			files.put(fileName, file);
 		}
-		logger.debug("     done reading files");
+		System.out.println("     done reading files");
 
 		try {
 			// now try to install the service
-			logger.debug("     invoking installSensor");
+			System.out.println("     invoking installSensor");
 			installSensor(sensorName, classFile, files);
-			logger.debug("   installing sensor '" + sensorName + "' succeeded");
+			System.out.println("   installing sensor '" + sensorName + "' succeeded");
 			out.write(Protocol.RESULT_OK);
 			out.flush();
 			return false;
 		} catch (Exception e) {
 			// if something failed, write the exception into the
 			// message.
-			logger.debug("   installing sensor '" + sensorName + "' failed: "
+			System.out.println("   installing sensor '" + sensorName + "' failed: "
 					+ e);
 			out.write(Protocol.RESULT_EXCEPTION);
 			out.writeObject(e);
@@ -361,19 +361,19 @@ public class CuckooServer {
 			ObjectOutputStream out) throws IOException {
 		// read the sensor name
 		final String sensorName = in.readUTF();
-		logger.debug("   initializing sensor '" + sensorName + "'...");
+		System.out.println("   initializing sensor '" + sensorName + "'...");
 		try {
 			// now try to initialize the sensor
 			initializeSensor(sensorName);
 			out.write(Protocol.RESULT_OK);
 			out.flush();
-			logger.debug("   initializing sensor '" + sensorName
+			System.out.println("   initializing sensor '" + sensorName
 					+ "' succeeded");
 			return false;
 		} catch (Exception e) {
 			// if something failed, write the exception into the
 			// message.
-			logger.debug("   initializing sensor '" + sensorName + "' failed: "
+			System.out.println("   initializing sensor '" + sensorName + "' failed: "
 					+ e);
 			out.write(Protocol.RESULT_EXCEPTION);
 			out.writeObject(e);
@@ -388,7 +388,7 @@ public class CuckooServer {
 			ObjectOutputStream out) throws IOException {
 		// read the sensor name
 		final String sensorName = in.readUTF();
-		logger.debug("   registering for sensor '" + sensorName + "'...");
+//		System.out.println("   registering for sensor '" + valuePath + "'...");
 		try {
 			final String registrationId = in.readUTF();
 			final String apiKey = in.readUTF();
@@ -396,7 +396,7 @@ public class CuckooServer {
 			final String valuePath = in.readUTF();
 			final Map<String, Object> configAsMap = (Map<String, Object>) in
 					.readObject();
-
+			System.out.println("   registering for sensor '" + valuePath + "'...");
 			// now try to initialize the sensor
 			if (!isSensorInstalled(sensorName)) {
 				throw new NotInstalledException("Sensor '" + sensorName
@@ -413,12 +413,12 @@ public class CuckooServer {
 			monitors.put(id, monitor);
 			out.write(Protocol.RESULT_OK);
 			out.flush();
-			logger.debug("   registering sensor '" + sensorName + "' succeeded");
+			System.out.println("   registering sensor '" + valuePath + "' succeeded");
 			return true;
 		} catch (Exception e) {
 			// if something failed, write the exception into the
 			// message.
-			logger.debug("   registering sensor '" + sensorName + "' failed: "
+			System.out.println("   registering sensor '" + sensorName + "' failed: "
 					+ e);
 			out.write(Protocol.RESULT_EXCEPTION);
 			out.writeObject(e);
@@ -430,17 +430,17 @@ public class CuckooServer {
 	private boolean handleUnregisterSensor(ObjectInputStream in,
 			ObjectOutputStream out) throws IOException {
 		final String id = in.readUTF();
-		logger.debug("   unregistering for id '" + id + "'...");
+		System.out.println("   unregistering for id '" + id + "'...");
 		try {
 			monitors.remove(id).interrupt();
 			out.write(Protocol.RESULT_OK);
 			out.flush();
-			logger.debug("   unregistering id '" + id + "' succeeded");
+			System.out.println("   unregistering id '" + id + "' succeeded");
 			return true;
 		} catch (Exception e) {
 			// if something failed, write the exception into the
 			// message.
-			logger.debug("   unregistering id '" + id + "' failed: " + e);
+			System.out.println("   unregistering id '" + id + "' failed: " + e);
 			out.write(Protocol.RESULT_EXCEPTION);
 			out.writeObject(e);
 			out.flush();
@@ -454,7 +454,7 @@ public class CuckooServer {
 		// serverSocket.setPerformancePreferences(0, 1, 2);
 		serverSocket.bind(new InetSocketAddress(PORT), 1);
 		displayIbisIdentifier(PORT);
-		logger.debug("start accepting...");
+		System.out.println("start accepting...");
 		while (true) {
 			Socket socket = serverSocket.accept();
 			socket.setSoTimeout(1000000);
@@ -470,7 +470,7 @@ public class CuckooServer {
 			while (!sessionEnded) {
 				int opcode = in.read();
 				long start = System.currentTimeMillis();
-				logger.debug("-> starting " + Protocol.toString(opcode));
+				System.out.println("-> starting " + Protocol.toString(opcode));
 				switch (opcode) {
 				case Protocol.OPCODE_DEBUG:
 					handleDebug(in, out, start);
@@ -503,7 +503,7 @@ public class CuckooServer {
 				default:
 					break;
 				}
-				logger.debug("   handling " + Protocol.toString(opcode)
+				System.out.println("   handling " + Protocol.toString(opcode)
 						+ " took " + (System.currentTimeMillis() - start)
 						+ " ms. " + (sessionEnded ? "ENDED" : "CONTINUING")
 						+ "\n");
